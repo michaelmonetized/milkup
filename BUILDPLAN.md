@@ -7,6 +7,20 @@
 
 ---
 
+## ⚠️ CONSTRAINTS & SECURITY
+
+**DO NOT USE:**
+- ❌ Next.js 15.x (CVE early 2026)
+- ❌ React 18.x (CVE early 2026)
+
+**MUST USE:**
+- ✅ Next.js 14.2.0 or later (LTS branch)
+- ✅ React 19.0.0 or later (latest with security patches)
+
+**Apply this constraint to ALL future projects** (Milkup, HurleyUS, HustleLaunch clients, etc).
+
+---
+
 ## Overview
 
 Milkup is a **modern web editor** replacing textarea-based editors on HustleLaunch client websites. Features:
@@ -465,13 +479,18 @@ bun run dev          # Dev server starts on :3000
 ### Existing packages (keep)
 ```json
 {
-  "react": "^18.3.1",
-  "react-dom": "^18.3.1",
-  "next": "^15.0.0",
+  "react": "^19.0.0",
+  "react-dom": "^19.0.0",
+  "next": "^14.2.0",
   "tailwindcss": "^3.4.14",
   "lucide-react": "^0.468.0"
 }
 ```
+
+⚠️ **CRITICAL:** Do NOT use Next.js 15 or React 18 — both have CVEs from early 2026.
+- Next.js 14.2.0 (LTS, stable, security patches applied)
+- React 19.0.0 (latest, has security patches)
+Use these versions for all future projects.
 
 ### Size impact
 - TipTap: ~150KB gzipped

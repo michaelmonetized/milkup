@@ -1,15 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { isVideoUrl, isImageUrl } from "@/lib/milkdown-video-plugin";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useState } from "react";
 import { X } from "lucide-react";
-
-interface Media {
-  filename: string;
-  type: string;
-  url: string;
-  source: string;
-}
 
 interface MediaPickerProps {
   isOpen: boolean;
@@ -17,68 +11,34 @@ interface MediaPickerProps {
   onSelect: (url: string, type: "image" | "video") => void;
 }
 
-// Mock media library - in real app, fetch from Convex
-const MOCK_MEDIA: Media[] = [
-  {
-    filename: "sample-image.jpg",
-    type: "image",
-    url: "https://images.unsplash.com/photo-1505394033641-40c6ad1178d7?w=200",
-    source: "public",
-  },
-  {
-    filename: "landscape.jpg",
-    type: "image",
-    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200",
-    source: "public",
-  },
-  {
-    filename: "tech.jpg",
-    type: "image",
-    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200",
-    source: "public",
-  },
-  {
-    filename: "sample-video.mp4",
-    type: "video",
-    url: "https://commondatastorage.googleapis.com/gtv-videos-library/sample/big_buck_bunny.mp4",
-    source: "public",
-  },
-];
-
 export default function MediaPicker({
   isOpen,
   onClose,
   onSelect,
 }: MediaPickerProps) {
-  const [filteredMedia, setFilteredMedia] = useState<Media[]>(MOCK_MEDIA);
   const [selectedType, setSelectedType] = useState<"all" | "image" | "video">(
     "all"
   );
 
-  useEffect(() => {
-    if (selectedType === "all") {
-      setFilteredMedia(MOCK_MEDIA);
-    } else {
-      setFilteredMedia(
-        MOCK_MEDIA.filter((m) =>
-          selectedType === "image" ? isImageUrl(m.url) : isVideoUrl(m.url)
-        )
-      );
-    }
-  }, [selectedType]);
+  // Fetch all media from Convex
+  const allMedia: any[] = useQuery(api.media.listMedia) ?? [];
+
+  const filteredMedia = allMedia.filter((m: any) => {
+    if (selectedType === "all") return true;
+    return m.type === selectedType;
+  });
 
   if (!isOpen) return null;
 
-  const handleSelect = (media: Media) => {
-    const type = isVideoUrl(media.url)
-      ? ("video" as const)
-      : ("image" as const);
-    onSelect(media.url, type);
+  const handleSelect = (url: string, type: string) => {
+    const mediaType =
+      type === "video" ? ("video" as const) : ("image" as const);
+    onSelect(url, mediaType);
     onClose();
   };
 
-  const getThumbnail = (url: string) => {
-    if (isVideoUrl(url)) {
+  const getThumbnail = (url: string, type: string) => {
+    if (type === "video") {
       return (
         <video
           src={url}
@@ -87,19 +47,20 @@ export default function MediaPicker({
         />
       );
     }
-    if (isImageUrl(url)) {
-      return <img src={url} alt="media" className="w-full h-20 object-cover rounded" />;
-    }
     return (
-      <div className="w-full h-20 bg-slate-700 rounded flex items-center justify-center text-xs">
-        No preview
-      </div>
+      <img src={url} alt="media" className="w-full h-20 object-cover rounded" />
     );
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Select Media</h2>
           <button
@@ -143,24 +104,28 @@ export default function MediaPicker({
           </button>
         </div>
 
-        {filteredMedia.length === 0 ? (
-          <div className="text-center py-8 text-slate-400">
-            No media found. Upload some first!
-          </div>
-        ) : (
-          <div className="media-grid">
-            {filteredMedia.map((media) => (
-              <div
-                key={media.filename}
-                onClick={() => handleSelect(media)}
-                className="media-item"
-              >
-                {getThumbnail(media.url)}
-                <p className="media-filename">{media.filename}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="overflow-y-auto flex-1">
+          {filteredMedia.length === 0 ? (
+            <div className="text-center py-8 text-slate-400">
+              No media found. Seed some data in Convex dashboard!
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {filteredMedia.map((media) => (
+                <div
+                  key={media._id}
+                  onClick={() => handleSelect(media.url, media.type)}
+                  className="cursor-pointer hover:opacity-80 transition"
+                >
+                  {getThumbnail(media.url, media.type)}
+                  <p className="text-xs mt-1 truncate text-slate-300">
+                    {media.filename}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
