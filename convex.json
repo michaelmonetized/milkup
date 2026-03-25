@@ -1,3 +1,4 @@
 {
-  "authInfo": "node"
+  "authInfo": "node",
+  "deploymentName": "hustle-testing/milkup-editor"
 }
