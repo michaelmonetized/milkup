@@ -5,6 +5,15 @@ import { api } from "@/convex/_generated/api";
 import { useState } from "react";
 import { X } from "lucide-react";
 
+interface Media {
+  _id: string;
+  filename: string;
+  type: string;
+  url: string;
+  source: string;
+  uploadedAt: number;
+}
+
 interface MediaPickerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,9 +30,9 @@ export default function MediaPicker({
   );
 
   // Fetch all media from Convex
-  const allMedia: any[] = useQuery(api.media.listMedia) ?? [];
+  const allMedia = (useQuery(api.media.listMedia) ?? []) as Media[];
 
-  const filteredMedia = allMedia.filter((m: any) => {
+  const filteredMedia = allMedia.filter((m: Media) => {
     if (selectedType === "all") return true;
     return m.type === selectedType;
   });
@@ -53,14 +62,8 @@ export default function MediaPicker({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Select Media</h2>
           <button
@@ -104,28 +107,24 @@ export default function MediaPicker({
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1">
-          {filteredMedia.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
-              No media found. Seed some data in Convex dashboard!
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredMedia.map((media) => (
-                <div
-                  key={media._id}
-                  onClick={() => handleSelect(media.url, media.type)}
-                  className="cursor-pointer hover:opacity-80 transition"
-                >
-                  {getThumbnail(media.url, media.type)}
-                  <p className="text-xs mt-1 truncate text-slate-300">
-                    {media.filename}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {filteredMedia.length === 0 ? (
+          <div className="text-center py-8 text-slate-400">
+            No media found. Upload some first!
+          </div>
+        ) : (
+          <div className="media-grid">
+            {filteredMedia.map((media: Media) => (
+              <div
+                key={media._id}
+                onClick={() => handleSelect(media.url, media.type)}
+                className="media-item"
+              >
+                {getThumbnail(media.url, media.type)}
+                <p className="media-filename">{media.filename}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
