@@ -481,16 +481,16 @@ bun run dev          # Dev server starts on :3000
 {
   "react": "^19.0.0",
   "react-dom": "^19.0.0",
-  "next": "^14.2.0",
+  "next": "^16.0.0",
   "tailwindcss": "^3.4.14",
   "lucide-react": "^0.468.0"
 }
 ```
 
 ⚠️ **CRITICAL:** Do NOT use Next.js 15 or React 18 — both have CVEs from early 2026.
-- Next.js 14.2.0 (LTS, stable, security patches applied)
-- React 19.0.0 (latest, has security patches)
-Use these versions for all future projects.
+- Next.js 16.x (latest, Vercel-ready, all security patches)
+- React 19.0.0 (latest, all security patches)
+Use these versions for all future projects. **Vercel supports Next.js latest.**
 
 ### Size impact
 - TipTap: ~150KB gzipped
