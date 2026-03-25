@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   color-scheme: dark;
@@ -18,7 +20,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Milkdown editor styles */
+/* Editor styles */
 .milkdown {
   background: rgb(15, 23, 42);
   border: 1px solid rgb(51, 65, 85);

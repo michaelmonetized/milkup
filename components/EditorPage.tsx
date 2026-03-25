@@ -1,14 +1,7 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import { Milkdown, useEditor } from "@milkdown/react";
-import { commonmark } from "@milkdown/preset-commonmark";
-import { plugin } from "@milkdown/utils";
-import { history } from "@milkdown/plugin-history";
-import { clipboard } from "@milkdown/plugin-clipboard";
-import { image } from "@milkdown/plugin-image";
+import { useState } from "react";
 import MediaPicker from "./MediaPicker";
-import { isVideoUrl } from "@/lib/milkdown-video-plugin";
 import { ImagePlus, Save } from "lucide-react";
 
 export default function EditorPage() {
@@ -17,7 +10,6 @@ export default function EditorPage() {
     "# Welcome to Milkup\n\nStart editing or insert media using the buttons below."
   );
   const [preview, setPreview] = useState(markdown);
-  const editorRef = useRef<any>(null);
 
   const handleMediaSelect = (url: string, type: "image" | "video") => {
     // Insert markdown at cursor position
@@ -78,7 +70,7 @@ export default function EditorPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">🥛 Milkup</h1>
           <p className="text-slate-400">
-            Markdown editor with Milkdown + Convex media storage + video support
+            Markdown editor with media picker + video support (POC)
           </p>
         </div>
 
@@ -153,7 +145,7 @@ export default function EditorPage() {
           <h3 className="font-semibold mb-2">💡 How to use:</h3>
           <ul className="text-sm text-slate-300 space-y-1">
             <li>• Type markdown in the editor</li>
-            <li>• Click "Insert Media" to pick images/videos from Convex or /public/</li>
+            <li>• Click "Insert Media" to pick images/videos from the library</li>
             <li>• Videos use: <code className="bg-slate-700 px-1 rounded">!video[alt](url)</code></li>
             <li>• Images use: <code className="bg-slate-700 px-1 rounded">![alt](url)</code></li>
             <li>• Click "Save Draft" to store locally</li>

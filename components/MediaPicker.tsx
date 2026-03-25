@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { isVideoUrl, isImageUrl } from "@/lib/milkdown-video-plugin";
 import { X } from "lucide-react";
 
 interface Media {
-  _id: string;
   filename: string;
   type: string;
   url: string;
@@ -20,34 +17,55 @@ interface MediaPickerProps {
   onSelect: (url: string, type: "image" | "video") => void;
 }
 
+// Mock media library - in real app, fetch from Convex
+const MOCK_MEDIA: Media[] = [
+  {
+    filename: "sample-image.jpg",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1505394033641-40c6ad1178d7?w=200",
+    source: "public",
+  },
+  {
+    filename: "landscape.jpg",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200",
+    source: "public",
+  },
+  {
+    filename: "tech.jpg",
+    type: "image",
+    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200",
+    source: "public",
+  },
+  {
+    filename: "sample-video.mp4",
+    type: "video",
+    url: "https://commondatastorage.googleapis.com/gtv-videos-library/sample/big_buck_bunny.mp4",
+    source: "public",
+  },
+];
+
 export default function MediaPicker({
   isOpen,
   onClose,
   onSelect,
 }: MediaPickerProps) {
-  const [mediaList, setMediaList] = useState<Media[]>([]);
-  const [filteredMedia, setFilteredMedia] = useState<Media[]>([]);
+  const [filteredMedia, setFilteredMedia] = useState<Media[]>(MOCK_MEDIA);
   const [selectedType, setSelectedType] = useState<"all" | "image" | "video">(
     "all"
   );
 
-  const allMedia = useQuery(api.media.listMedia);
-
   useEffect(() => {
-    if (allMedia) {
-      setMediaList(allMedia);
-
-      if (selectedType === "all") {
-        setFilteredMedia(allMedia);
-      } else {
-        setFilteredMedia(
-          allMedia.filter((m) =>
-            selectedType === "image" ? isImageUrl(m.url) : isVideoUrl(m.url)
-          )
-        );
-      }
+    if (selectedType === "all") {
+      setFilteredMedia(MOCK_MEDIA);
+    } else {
+      setFilteredMedia(
+        MOCK_MEDIA.filter((m) =>
+          selectedType === "image" ? isImageUrl(m.url) : isVideoUrl(m.url)
+        )
+      );
     }
-  }, [allMedia, selectedType]);
+  }, [selectedType]);
 
   if (!isOpen) return null;
 
@@ -133,7 +151,7 @@ export default function MediaPicker({
           <div className="media-grid">
             {filteredMedia.map((media) => (
               <div
-                key={media._id}
+                key={media.filename}
                 onClick={() => handleSelect(media)}
                 className="media-item"
               >
